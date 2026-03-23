@@ -1,7 +1,4 @@
 OS := $(shell uname)
-ifeq ($(OS), "") # uname failed, try something else
-	OS != uname
-endif
 
 THREADS_LIB := -lpthread
 ifeq ($(OS), Minix)
@@ -9,6 +6,6 @@ ifeq ($(OS), Minix)
 endif
 
 all:
-	clang main.c -lpthread -o main
+	clang main.c $(THREADS_LIB) -o main
 check_leaks:
 	valgrind --leak-check=full ./main
