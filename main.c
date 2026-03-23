@@ -47,6 +47,7 @@ void *thread_work(void *arguments) {
     }
     args->result = count;
     thread_exit(NULL);
+    return NULL;
 }
 
 int calc_greater_parallel(int *nums, int nums_count, int thread_count) {
@@ -81,7 +82,7 @@ int calc_greater_parallel(int *nums, int nums_count, int thread_count) {
         result += threads_args[i].result;
     }
     clock_gettime(1, &t1);
-    printf("time = %ld\n", (t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_nsec - t0.tv_nsec) / 1000);
+    printf("time = %lld\n", (long long)(t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_nsec - t0.tv_nsec) / 1000);
     free(threads_ids);
     free(threads_args);
     return result;
@@ -98,7 +99,7 @@ int calc_greater(int *nums, int nums_count) {
         }
     }
     clock_gettime(1, &t1);
-    printf("time = %ld\n", (t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_nsec - t0.tv_nsec) / 1000);
+    printf("time = %lld\n", (long long)(t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_nsec - t0.tv_nsec) / 1000);
     return result;
 }
 
