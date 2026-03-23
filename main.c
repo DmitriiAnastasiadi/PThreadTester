@@ -1,7 +1,23 @@
+#ifdef __minix__
+#include <minix/mthread.h>
+#else
 #include <pthread.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
+#ifdef __minix__
+#define thread_t mthread_thread_t
+#define thread_create mthread_create
+#define thread_join mthread_join
+#define thread_exit mthread_exit
+#else
+#define thread_t pthread_t
+#define thread_create pthread_create
+#define thread_join pthread_join
+#define thread_exit pthread_exit
+#endif
 
 #define ARRAY_COUNT 10000000
 #define THREADS_COUNT 4
@@ -30,7 +46,7 @@ void *thread_work(void *arguments) {
         }
     }
     args->result = count;
-    pthread_exit(NULL);
+    thread_exit(NULL);
 }
 
 int calc_greater_parallel(int *nums, int nums_count, int thread_count) {
@@ -39,7 +55,7 @@ int calc_greater_parallel(int *nums, int nums_count, int thread_count) {
     clock_gettime(1, &t0);
 
     // prepare threads
-    pthread_t *threads_ids = calloc(sizeof(pthread_t), thread_count);
+    thread_t *threads_ids = calloc(sizeof(thread_t), thread_count);
     thread_arguments *threads_args = calloc(sizeof(thread_arguments), thread_count);
     for (int i = 0; i < thread_count; i++) {
         thread_arguments th_arg = {
@@ -48,14 +64,14 @@ int calc_greater_parallel(int *nums, int nums_count, int thread_count) {
             .end = (i != thread_count - 1) ? (nums_count / thread_count * (i + 1)) : nums_count
         };
         threads_args[i] = th_arg;
-        if (pthread_create(&(threads_ids[i]), NULL, &thread_work, &threads_args[i])) {
+        if (thread_create(&(threads_ids[i]), NULL, &thread_work, &threads_args[i])) {
             printf("Error occured while creating thread\n");
             exit(EXIT_FAILURE);
         }
     }
     // joining threads
     for (int i = 0; i < thread_count; i++) {
-        if (pthread_join(threads_ids[i], NULL)) {
+        if (thread_join(threads_ids[i], NULL)) {
             printf("Error occured while joining thread\n");
             exit(EXIT_FAILURE);
         }
